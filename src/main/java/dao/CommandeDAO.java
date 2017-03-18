@@ -24,7 +24,7 @@ import metier.modele.Restaurant;
 public class CommandeDAO {
     
     public enum Etat{
-        EN_ATTENTE,EN_COURS,TERMINE
+        EN_ATTENTE,ANNULE,EN_COURS,TERMINE
     }
     
 
@@ -55,6 +55,33 @@ public class CommandeDAO {
             throw e;
         }
         return commande;
+    }
+    
+    public List<Commande> findByEtat(int etat) throws Exception {
+        EntityManager em = JpaUtil.obtenirEntityManager();
+        List<Commande> commandes = null;
+        try {
+            Query q = em.createQuery("SELECT c FROM Commande c WHERE c.etat = :etat");
+            q.setParameter("etat", etat);
+            commandes = (List<Commande>) q.getResultList();
+        }
+        catch(Exception e) {
+            throw e;
+        }
+        if(commandes.isEmpty()){
+            return null;
+        }
+        return commandes;
+    }
+    
+    public void persist(Commande c){
+        EntityManager em = JpaUtil.obtenirEntityManager();
+        em.persist(c);
+    }
+    
+    public void merge(Commande c){
+        EntityManager em = JpaUtil.obtenirEntityManager();
+        em.merge(c);
     }
     
 }

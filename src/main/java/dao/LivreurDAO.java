@@ -50,4 +50,18 @@ public class LivreurDAO {
         return livreur;
     }
     
+    public List<Livreur> findAll() throws Exception {
+        EntityManager em = JpaUtil.obtenirEntityManager();
+        List<Livreur> livreurs = null;
+        try {
+            Query q = em.createQuery("SELECT l FROM Livreur l");
+            livreurs = (List<Livreur>) q.getResultList();
+        }
+        catch(Exception e) {
+            throw e;
+        }
+        
+        return livreurs;
+    }
+    
 }
