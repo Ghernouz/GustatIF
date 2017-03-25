@@ -1,8 +1,10 @@
 package dao;
 
+import com.google.maps.model.LatLng;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import metier.modele.Client;
 
@@ -44,35 +46,28 @@ public class ClientDAO {
     public Client findByEmail(String adresse){
         EntityManager em = JpaUtil.obtenirEntityManager();
         
-        List<Client> clients = null;
+        Client client = null;
         try {
-            JpaUtil.ouvrirTransaction();
-            //Query q = em.createQuery("SELECT c FROM Client c WHERE c.mail = :mail");
-            Query q = em.createQuery("SELECT c FROM Client c");
-            q.setFirstResult(0);
-            q.setMaxResults(1);
+            Query q = em.createQuery("SELECT c FROM Client c WHERE c.mail = :mail");
             q.setParameter("mail", adresse);
-            clients = (List<Client>) q.getResultList();
-            JpaUtil.validerTransaction();
+            client = (Client) q.getSingleResult();
         }
         catch(Exception e) {
             if(e instanceof NullPointerException){
+                return null;
+            }
+            else if(e instanceof NoResultException){
                 return null;
             }
             else{
                 throw e;
             }
         }
-        if(clients.isEmpty()){
-            return null;
-        }
-        else{
-            return clients.get(0);
-        }
+        return client;
     }
     
-    public Client createClient(String nom, String prenom,String mail,String adresse){
-        Client c = new Client(nom,prenom,mail,adresse);
+    public Client createClient(String nom, String prenom,String mail,String adresse,LatLng latlng){
+        Client c = new Client(nom,prenom,mail,adresse,latlng);
         EntityManager em = JpaUtil.obtenirEntityManager();
         em.persist(c);
         return c;
